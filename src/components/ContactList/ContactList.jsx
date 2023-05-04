@@ -1,35 +1,23 @@
-import styles from './ContactList.module.css';
+import { useSelector } from 'react-redux';
+import { getContact, getFilterSearchValue } from 'redux/selectors';
+import { ContactItem } from 'components/ContactItem/ContactItem';
 
-const ContactList = ({ contacts, onRemove, children }) => {
+const getVisibleTasks = (contacts, filterSearchValue) => {
+  return filterSearchValue
+    ? contacts.filter(contact =>
+        contact.name.toLowerCase().includes(filterSearchValue.toLowerCase())
+      )
+    : contacts;
+};
+export const ContactList = () => {
+  const contacts = useSelector(getContact);
+  const filterSearchValue = useSelector(getFilterSearchValue);
+  const visibleContacts = getVisibleTasks(contacts, filterSearchValue);
   return (
-    <div className={styles.contacts}>
-      <h2>Contacts</h2>
-      {children}
-      <ul>
-        {contacts.length === 0 ? null : (
-          <>
-            {contacts.map(contact => {
-              return (
-                <li key={contact.id}>
-                  <p>
-                    <span>{contact.name} : </span>
-                    {contact.number}
-                  </p>
-                  <button
-                    onClick={() => {
-                      onRemove(contact.id);
-                    }}
-                  >
-                    ⛌
-                  </button>
-                </li>
-              );
-            })}
-          </>
-        )}
-      </ul>
-    </div>
+    <ul>
+      {visibleContacts.map(contact => {
+        return <ContactItem contact={contact} key={contact.id} />;
+      })}
+    </ul>
   );
 };
-
-export default ContactList;
